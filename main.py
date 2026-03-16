@@ -5,6 +5,8 @@ from app.domains.news_search.adapter.inbound.api.saved_article_router import rou
 from app.domains.news_search.infrastructure.orm.saved_article_orm import SavedArticleORM  # noqa: F401
 from app.domains.post.adapter.inbound.api.post_router import router as post_router
 from app.domains.post.infrastructure.orm.post_orm import PostORM  # noqa: F401
+from app.domains.watchlist.adapter.inbound.api.watchlist_router import router as watchlist_router
+from app.domains.watchlist.infrastructure.orm.watchlist_item_orm import WatchlistItemORM  # noqa: F401
 from app.infrastructure.config.settings import Settings, get_settings
 from app.infrastructure.database.session import Base, engine
 
@@ -17,6 +19,7 @@ app = FastAPI(debug=settings.debug)
 app.include_router(post_router)
 app.include_router(news_search_router)
 app.include_router(saved_article_router)
+app.include_router(watchlist_router)
 
 
 @app.get("/")

@@ -1,0 +1,38 @@
+from typing import Optional, List
+
+from sqlalchemy.orm import Session
+
+from app.domains.watchlist.application.usecase.watchlist_repository_port import WatchlistRepositoryPort
+from app.domains.watchlist.domain.entity.watchlist_item import WatchlistItem
+from app.domains.watchlist.infrastructure.mapper.watchlist_item_mapper import WatchlistItemMapper
+from app.domains.watchlist.infrastructure.orm.watchlist_item_orm import WatchlistItemORM
+
+
+class WatchlistRepositoryImpl(WatchlistRepositoryPort):
+    def __init__(self, db: Session):
+        self._db = db
+
+    def save(self, item: WatchlistItem) -> WatchlistItem:
+        orm = WatchlistItemMapper.to_orm(item)
+        self._db.add(orm)
+        self._db.commit()
+        self._db.refresh(orm)
+        return WatchlistItemMapper.to_entity(orm)
+
+    def find_by_symbol(self, symbol: str) -> Optional[WatchlistItem]:
+        orm = self._db.query(WatchlistItemORM).filter(WatchlistItemORM.symbol == symbol).first()
+        if orm is None:
+            return None
+        return WatchlistItemMapper.to_entity(orm)
+
+    def find_all(self) -> List[WatchlistItem]:
+        orms = self._db.query(WatchlistItemORM).order_by(WatchlistItemORM.created_at.desc()).all()
+        return [WatchlistItemMapper.to_entity(orm) for orm in orms]
+
+    def delete_by_id(self, item_id: int) -> bool:
+        orm = self._db.query(WatchlistItemORM).filter(WatchlistItemORM.id == item_id).first()
+        if orm is None:
+            return False
+        self._db.delete(orm)
+        self._db.commit()
+        return True
