@@ -15,3 +15,4 @@ class AnalysisLogResponse(BaseModel):
     confidence: float
     source_type: str = "NEWS"
     account_id: Optional[int] = None
+    url: Optional[str] = None

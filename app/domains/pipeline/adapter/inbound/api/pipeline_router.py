@@ -38,6 +38,7 @@ def _log_to_summary(log) -> StockSummaryResponse:
         sentiment_score=log.sentiment_score,
         confidence=log.confidence,
         source_type=log.source_type,
+        url=getattr(log, "url", None),
     )
 
 

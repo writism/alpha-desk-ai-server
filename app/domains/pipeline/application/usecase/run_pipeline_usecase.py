@@ -116,6 +116,7 @@ class RunPipelineUseCase:
                     sentiment_score=analysis.sentiment_score,
                     confidence=analysis.confidence,
                     source_type=source_type,
+                    url=url,
                 ))
 
             if report_best:
@@ -137,6 +138,7 @@ class RunPipelineUseCase:
                     sentiment_score=analysis.sentiment_score,
                     confidence=analysis.confidence,
                     source_type=source_type,
+                    url=url,
                 ))
 
             if news_best or report_best:

@@ -24,6 +24,7 @@ class AnalysisLogRepositoryImpl(AnalysisLogRepositoryPort):
                 confidence=log.confidence,
                 source_type=log.source_type,
                 account_id=account_id,
+                url=getattr(log, "url", None),
             )
             self._db.add(orm)
         self._db.commit()
@@ -50,6 +51,7 @@ class AnalysisLogRepositoryImpl(AnalysisLogRepositoryPort):
                     confidence=orm.confidence,
                     source_type=orm.source_type or "NEWS",
                     account_id=orm.account_id,
+                    url=orm.url,
                 ))
         return result
 
@@ -70,6 +72,7 @@ class AnalysisLogRepositoryImpl(AnalysisLogRepositoryPort):
                 confidence=orm.confidence,
                 source_type=orm.source_type or "NEWS",
                 account_id=orm.account_id,
+                url=orm.url,
             )
             for orm in orms
         ]
