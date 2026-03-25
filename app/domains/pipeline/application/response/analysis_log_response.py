@@ -13,4 +13,6 @@ class AnalysisLogResponse(BaseModel):
     sentiment: str
     sentiment_score: float
     confidence: float
+    source_type: str = "NEWS"
     account_id: Optional[int] = None
+    url: Optional[str] = None
