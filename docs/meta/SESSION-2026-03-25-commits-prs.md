@@ -4,7 +4,8 @@
 
 ## 이 저장소 PR
 
-- **PR:** https://github.com/writism/alpha-desk-ai-server/pull/6  
+- **포크 PR:** https://github.com/writism/alpha-desk-ai-server/pull/6  
+- **업스트림 PR (팀 머지):** https://github.com/EDDI-RobotAcademy/alpha-desk-ai-server/pull/28  
 - **브랜치:** `feat/bl-be-04-17-backlog-heatmap-pipeline`
 
 ## 커밋 (4개)
