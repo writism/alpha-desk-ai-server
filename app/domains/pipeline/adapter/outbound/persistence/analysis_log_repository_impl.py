@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+from sqlalchemy import or_
 from sqlalchemy.orm import Session
 
 from app.domains.pipeline.application.response.analysis_log_response import AnalysisLogResponse
@@ -33,7 +34,13 @@ class AnalysisLogRepositoryImpl(AnalysisLogRepositoryPort):
         query = self._db.query(AnalysisLogORM)
         if account_id is not None:
             query = query.filter(AnalysisLogORM.account_id == account_id)
-        query = query.filter(AnalysisLogORM.source_type.in_(source_types))
+        # NULL source_type은 NEWS로 간주 (컬럼 추가 이전 레코드 호환)
+        if "NEWS" in source_types:
+            query = query.filter(
+                or_(AnalysisLogORM.source_type.in_(source_types), AnalysisLogORM.source_type.is_(None))
+            )
+        else:
+            query = query.filter(AnalysisLogORM.source_type.in_(source_types))
         orms = query.order_by(AnalysisLogORM.analyzed_at.desc()).all()
         seen: set = set()
         result = []

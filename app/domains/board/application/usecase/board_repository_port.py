@@ -20,3 +20,11 @@ class BoardRepositoryPort(ABC):
     @abstractmethod
     def count_total(self) -> int:
         pass
+
+    @abstractmethod
+    def update(self, board_id: int, title: str, content: str) -> Optional[Board]:
+        pass
+
+    @abstractmethod
+    def delete(self, board_id: int) -> bool:
+        pass
