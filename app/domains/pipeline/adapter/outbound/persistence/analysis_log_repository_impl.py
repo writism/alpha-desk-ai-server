@@ -62,6 +62,31 @@ class AnalysisLogRepositoryImpl(AnalysisLogRepositoryPort):
                 ))
         return result
 
+    def find_by_symbol(self, symbol: str, limit: int = 20) -> List[AnalysisLogResponse]:
+        orms = (
+            self._db.query(AnalysisLogORM)
+            .filter(AnalysisLogORM.symbol == symbol.upper())
+            .order_by(AnalysisLogORM.analyzed_at.desc())
+            .limit(limit)
+            .all()
+        )
+        return [
+            AnalysisLogResponse(
+                analyzed_at=orm.analyzed_at,
+                symbol=orm.symbol,
+                name=orm.name,
+                summary=orm.summary,
+                tags=orm.tags or [],
+                sentiment=orm.sentiment,
+                sentiment_score=orm.sentiment_score,
+                confidence=orm.confidence,
+                source_type=orm.source_type or "NEWS",
+                account_id=orm.account_id,
+                url=orm.url,
+            )
+            for orm in orms
+        ]
+
     def find_recent(self, limit: int = 50, account_id: Optional[int] = None) -> List[AnalysisLogResponse]:
         query = self._db.query(AnalysisLogORM)
         if account_id is not None:

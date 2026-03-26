@@ -16,3 +16,7 @@ class AnalysisLogRepositoryPort(ABC):
     @abstractmethod
     def find_recent(self, limit: int = 50, account_id: Optional[int] = None) -> List[AnalysisLogResponse]:
         pass
+
+    @abstractmethod
+    def find_by_symbol(self, symbol: str, limit: int = 20) -> List[AnalysisLogResponse]:
+        pass
