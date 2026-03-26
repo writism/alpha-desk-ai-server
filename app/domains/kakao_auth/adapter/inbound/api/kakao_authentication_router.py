@@ -66,16 +66,15 @@ async def request_access_token_after_redirection(
             user_info_port=_kakao_token_adapter,
             account_repository=AccountRepositoryImpl(db),
             temp_token_store=_temp_token_store,
+            session_store=_kakao_session_store,
+            kakao_token_link=_kakao_token_link,
         )
         result = usecase.execute(code)
 
         response = RedirectResponse(url=_settings.frontend_auth_callback_url)
 
-        if result.is_registered and result.account_id:
-            user_token = _kakao_session_store.create(result.account_id)
-            if result.kakao_access_token:
-                _kakao_token_link.save(result.account_id, result.kakao_access_token)
-            response.set_cookie(key="user_token", value=user_token, httponly=True, max_age=3600 * 24 * 7, samesite="lax")
+        if result.is_registered and result.user_token:
+            response.set_cookie(key="user_token", value=result.user_token, httponly=True, max_age=3600 * 24 * 7, samesite="lax")
             response.set_cookie(key="nickname", value=quote(result.nickname), max_age=3600 * 24 * 7, samesite="lax")
             response.set_cookie(key="email", value=quote(result.email), max_age=3600 * 24 * 7, samesite="lax")
             response.set_cookie(key="account_id", value=str(result.account_id), max_age=3600 * 24 * 7, samesite="lax")
