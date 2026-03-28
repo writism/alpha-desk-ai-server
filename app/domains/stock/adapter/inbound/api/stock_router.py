@@ -1,9 +1,12 @@
 import asyncio
 import logging
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 
+from app.domains.pipeline.adapter.outbound.persistence.analysis_log_repository_impl import AnalysisLogRepositoryImpl
+from app.domains.pipeline.application.response.analysis_log_response import AnalysisLogResponse
 from app.domains.stock.adapter.outbound.external.dart_corp_code_adapter import DartCorpCodeAdapter
 from app.domains.stock.adapter.outbound.external.krx_market_adapter import KrxMarketAdapter
 from app.domains.stock.adapter.outbound.persistence.stock_repository_impl import StockRepositoryImpl
@@ -16,6 +19,14 @@ from app.domains.stock.application.usecase.sync_market_usecase import SyncMarket
 from app.infrastructure.config.settings import get_settings
 from app.infrastructure.database.session import get_db
 from sqlalchemy.orm import Session
+
+
+class StockDetailResponse(BaseModel):
+    symbol: str
+    name: str
+    market: Optional[str] = None
+    analysis_logs: List[AnalysisLogResponse] = []
+
 
 router = APIRouter(prefix="/stocks", tags=["stocks"])
 
@@ -77,3 +88,19 @@ async def sync_market(db: Session = Depends(get_db)):
     except Exception as e:
         logger.error(f"[SyncMarket] 실패: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/{symbol}", response_model=StockDetailResponse)
+def get_stock_detail(symbol: str, db: Session = Depends(get_db)):
+    """종목 상세 — 기본 정보 + AI 분석 이력 최근 20건."""
+    symbol = symbol.strip().upper()
+    stock = StockRepositoryImpl(db).find_by_symbol(symbol)
+    if not stock:
+        raise HTTPException(status_code=404, detail="종목을 찾을 수 없습니다.")
+    logs = AnalysisLogRepositoryImpl(db).find_by_symbol(symbol, limit=20)
+    return StockDetailResponse(
+        symbol=stock.symbol,
+        name=stock.name,
+        market=stock.market,
+        analysis_logs=logs,
+    )

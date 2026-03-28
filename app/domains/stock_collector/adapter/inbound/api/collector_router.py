@@ -5,10 +5,9 @@ from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from app.domains.stock_collector.adapter.outbound.external.dart_collector_adapter import DartCollectorAdapter
+from app.domains.stock_collector.adapter.outbound.external.dart_report_collector_adapter import DartReportCollectorAdapter
 from app.domains.stock_collector.adapter.outbound.external.google_news_rss_collector_adapter import GoogleNewsRssCollectorAdapter
-from app.domains.stock_collector.adapter.outbound.external.naver_blog_cafe_collector_adapter import NaverBlogCafeCollectorAdapter
 from app.domains.stock_collector.adapter.outbound.external.news_collector_adapter import NewsCollectorAdapter
-from app.domains.stock_collector.adapter.outbound.external.twitter_collector_adapter import TwitterCollectorAdapter
 from app.domains.stock_collector.adapter.outbound.persistence.raw_article_repository_impl import RawArticleRepositoryImpl
 from app.domains.stock_collector.application.request.collect_request import CollectRequest
 from app.domains.stock_collector.application.response.article_response import ArticleResponse
@@ -41,7 +40,7 @@ _NAME_TO_CODE = {
 async def collect_articles(request: CollectRequest, db: Session = Depends(get_db)):
     repository = RawArticleRepositoryImpl(db)
     stock_repository = StockRepositoryImpl(db)
-    collectors = [DartCollectorAdapter(), NewsCollectorAdapter(), GoogleNewsRssCollectorAdapter(), NaverBlogCafeCollectorAdapter()]
+    collectors = [DartCollectorAdapter(), DartReportCollectorAdapter(), NewsCollectorAdapter(), GoogleNewsRssCollectorAdapter()]
     usecase = CollectArticlesUseCase(repository, collectors, stock_repository=stock_repository)
     return usecase.execute(request.symbol)
 

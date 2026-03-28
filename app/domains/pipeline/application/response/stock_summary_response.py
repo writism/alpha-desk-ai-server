@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Optional
 
 from pydantic import BaseModel
@@ -13,3 +14,4 @@ class StockSummaryResponse(BaseModel):
     confidence: float
     source_type: str = "NEWS"  # NEWS | DISCLOSURE | REPORT
     url: Optional[str] = None
+    analyzed_at: Optional[datetime] = None
